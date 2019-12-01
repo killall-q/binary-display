@@ -1,0 +1,7 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-width='4'>
+	<path d='M4,8 v14 h8 v-12 h-8 M18,14 h6 m0,-6 v14 m-6,0 h12' stroke='#000'/>
+	<g stroke='#FFF' stroke-opacity='0.5'>
+		<path d='M1,8 v16 m1,1 h12 m1,-1 v-16 m-1,-1 h-12 M17,20 v4 m1,1 h12 m1,-1 v-4 m-1,-1 h-3 v-11 m-1,-1 h-4 m-1,1 v3 h-3 m-1,1 v4' stroke-width='2'/>
+		<path d='M8,12 v8 M18,18 h4'/>
+	</g>
+</svg>

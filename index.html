@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='UTF-8'>
+	<title>Binary Display</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<meta name='description' content='Binary display numeric/visual converter'>
+	<meta name='theme-color' content='#333'>
+	<meta property='og:title' content='Binary Display'>
+	<meta property='og:type' content='website'>
+	<meta property='og:url' content='https://killall-q.github.io/binary-display'>
+	<meta property='og:image' content='https://killall-q.github.io/binary-display/images/icon-192.png'>
+	<meta name='twitter:card' content='summary'>
+	<meta name='twitter:site' content='@joshuaptfan'>
+	<meta name='twitter:title' content='Binary Display'>
+	<meta name='twitter:description' content='Binary display numeric/visual converter'>
+	<meta name='twitter:image' content='https://killall-q.github.io/binary-display/images/icon-192.png'>
+	<link rel='icon' sizes='16x16 32x32 48x48' type='image/icon' href='favicon.ico'>
+	<link rel='icon' sizes='192x192' type='image/png' href='images/icon-192.png'>
+	<link rel='icon' sizes='any' type='image/svg+xml' href='images/icon.svg'>
+	<link rel='stylesheet' type='text/css' href='index.css'>
+	<link rel='manifest' href='manifest.json'>
+	<script src='index.js' defer></script>
+</head>
+<body>
+	<header>
+		<div id='warn-ES6'>Please <a href='http://outdatedbrowser.com/' target='_blank' rel='noopener'>update your browser</a> to use this site.</div>
+		<noscript>Please enable JavaScript to use this site.</noscript>
+		<div class='toolbar'>
+			<span>SIZE&ensp;X</span>
+			<input type='number' id='sizeX' min='1' max='128' value='8'>
+			<button id='sizeXDecr' value='-1' data-field='sizeX' title='[Left]'>&minus;</button>
+			<button id='sizeXIncr' value='1' data-field='sizeX' title='[Right]'>+</button>
+			<span>Y</span>
+			<input type='number' id='sizeY' min='1' max='128' value='8' disabled>
+			<button id='sizeYDecr' value='-1' data-field='sizeY' title='[Down]'>&minus;</button>
+			<button id='sizeYIncr' value='1' data-field='sizeY' title='[Up]'>+</button>
+			<input type='checkbox' id='square' checked>
+			<label for='square'>SQUARE</label>
+			<div class='flex'></div>
+			<span>AXIS&ensp;X</span>
+			<input type='radio' id='axisXL' name='axisX'>
+			<label for='axisXL' title='X axis left'></label>
+			<input type='radio' id='axisXR' name='axisX' checked>
+			<label for='axisXR' title='X axis right'></label>
+			<span>Y</span>
+			<input type='radio' id='axisYU' name='axisY'>
+			<label for='axisYU' title='Y axis up'></label>
+			<input type='radio' id='axisYD' name='axisY' checked>
+			<label for='axisYD' title='Y axis down'></label>
+			<input type='checkbox' id='grid' autocomplete='off' checked>
+			<label for='grid'>GRID</label>
+			<button id='about'>ABOUT</button>
+			<div class='break'></div>
+			<span title='Decimal'>DEC</span>
+			<input type='number' id='decimal' min='0' value='0'>
+			<button id='decimalDecr' value='-1' data-field='decimal' title='[-]'>&minus;</button>
+			<button id='decimalIncr' value='1' data-field='decimal' title='[=]'>+</button>
+			<div class='flex'></div>
+			<button id='clear' title='[Backspace]'>CLEAR</button>
+			<button id='invert'>INVERT</button>
+			<button id='copy' title='Copy number to clipboard'>COPY</button>
+			<button id='link' title='Copy link to recreate currently displayed image to clipboard'>LINK</button>
+		</div>
+	</header>
+	<div id='display'></div>
+	<div id='tips'>
+		<p>Scroll over fields to add &plusmn;1</p>
+		<p>Click and drag to paint</p>
+	</div>
+	<div id='about-bg'>
+		<div>
+			<h2>Binary Display Numeric/Visual Converter</h2>
+			<p>Lets you see what any number looks like as an image on a binary display, and vice versa.<br>
+				Can be used as a <a href='https://en.wikipedia.org/wiki/Binary_number' target='_blank' rel='noopener'>binary</a> teaching tool.</p>
+			<div id='keys'>
+				<h4>Keys</h4>
+				<b>Minus</b> &mdash; decrement number<br>
+				<b>Equals</b> &mdash; increment number<br>
+				<b>Backspace/Delete</b> &mdash; clear number<br>
+				<b>Arrow keys</b> &mdash; change size
+			</div>
+			<p>Designed by <a href='https://github.com/joshuaptfan' target='_blank' rel='noopener'>Joshua Fan</a></p>
+			<p><a href='https://github.com/killall-q/binary-display' target='_blank' rel='noopener'>Source on GitHub</a></p>
+		</div>
+	</div>
+	<textarea id='link-text' tabindex='-1' readonly></textarea>
+	<script>
+		try {
+			eval('"use strict"; let test = () => 0n;');
+		} catch (e) {
+			document.getElementById('warn-ES6').style.display = 'block';
+		}
+	</script>
+</body>
+</html>
