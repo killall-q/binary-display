@@ -1,14 +1,14 @@
 const base64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 var size = { x: 8, y: 8 };
 var axis = { x: 1, y: 1 };
+var number = 0n;
 
 document.onreadystatechange = function () {
-	let cellMouseDown, isCellChecked;
 	const toolbar = document.querySelector('.toolbar');
-	const sizeX = document.getElementById('sizeX');
-	const sizeY = document.getElementById('sizeY');
-	const decimal = document.getElementById('decimal');
+	const sizeX = document.querySelector('.sizeX');
+	const sizeY = document.querySelector('.sizeY');
 	const display = document.getElementById('display');
+	let cellMouseDown, isCellChecked;
 
 	window.addEventListener('resize', () => {
 		scaleDisplay();
@@ -17,18 +17,35 @@ document.onreadystatechange = function () {
 		parseHash(window.location.hash);
 		history.pushState(undefined, undefined, '.');
 	});
-	document.addEventListener('keydown', (e) => {
-		if (document.activeElement.type === 'number') return;
+	toolbar.addEventListener('focusin', e => {
+		if (/number|size.$/.test(e.target.className))
+			e.target.select();
+	});
+	document.addEventListener('keydown', e => {
+		if (/size.$/.test(e.target.className)) return;
+		else if (e.target.classList.item(1) === 'number') {
+			switch (e.target.classList.item(0)) {
+				case 'hex':
+					validate(e, /[^\dA-F]/i);
+					return;
+				case 'dec':
+					validate(e, /[^\d]/);
+					return;
+				case 'bin':
+					validate(e, /[^01]/);
+				default: return;
+			}
+		}
 		switch (e.key) {
 			case '-':
-				decimal.stepUp(-1);
+				add(-1n);
 				break;
 			case '=':
-				decimal.stepUp(1);
+				add(1n);
 				break;
 			case 'Backspace':
 			case 'Delete':
-				decimal.value = 0;
+				number = 0n;
 				break;
 			case 'ArrowRight':
 				sizeX.stepUp(2);
@@ -43,80 +60,74 @@ document.onreadystatechange = function () {
 				if (sizeY.disabled) return;
 				sizeY.stepUp(-1);
 				changeField(sizeY);
-				return;
 			default: return;
 		}
-		genDisplay();
+		syncNumber();
 	});
-	decimal.addEventListener('input', () => {
-		genDisplay();
-	});
-	toolbar.addEventListener('focusin', (e) => {
-		if (e.target.type === 'number')
-			e.target.select();
-	});
-	toolbar.addEventListener('click', (e) => {
-		if (e.target.hasAttribute('data-field')) {
-			const field = document.getElementById(e.target.dataset.field);
-			if (field.disabled) return;
-			field.stepUp(e.target.value);
-			changeField(field);
+	document.addEventListener('click', e => {
+		if (e.target.className === 'cell') return;
+		if (e.target.classList.contains('incr')) {
+			const field = document.querySelector('.' + /^(\w+)/.exec(e.target.className)[0]);
+			if (/size/.test(field.className)) {
+				if (field.disabled) return;
+				field.stepUp(e.target.value);
+				changeField(field);
+			} else
+				add(BigInt(e.target.value));
 			return;
 		}
-		switch (e.target.id) {
+		const aboutBg = document.querySelector('.about-bg');
+		switch (e.target.classList.item(0)) {
 			case 'grid':
 				display.classList.toggle('no-grid');
 				break;
 			case 'about':
-				document.getElementById('about-bg').style.display = 'block';
+				aboutBg.style.display = 'block';
+				break;
+			case 'about-bg':
+				if (e.target !== aboutBg) return;
+				aboutBg.style.display = 'none';
 				break;
 			case 'clear':
-				decimal.value = 0;
-				genDisplay();
+				number = 0n;
+				syncNumber();
 				break;
 			case 'invert':
 				invertDisplay();
 				break;
 			case 'copy':
-				copyNum();
+				copyNum(e.target);
 				break;
 			case 'link':
 				copyLink();
 		}
 	});
-	toolbar.addEventListener('change', (e) => {
+	toolbar.addEventListener('change', e => {
 		if (e.target.id === 'grid') return;
-		else if (e.target.id === 'decimal')
-			genDisplay();
-		else if (sizeX.value <= 128 && sizeY.value <= 128) {
+		else if (/^(?:hex|dec|bin)/.test(e.target.className)) {
+			if (e.target.value)
+				syncNumber(e.target);
+		} else if (sizeX.value <= 128 && sizeY.value <= 128) {
 			sizeY.disabled = document.getElementById('square').checked;
 			if (sizeY.disabled)
 				sizeY.value = sizeX.value;
 			drawDisplay();
 		}
 	});
-	document.getElementById('about-bg').addEventListener('click', (e) => {
-		if (e.target !== e.currentTarget) return;
-		e.currentTarget.style.display = 'none';
-	});
-	toolbar.addEventListener('wheel', (e) => {
+	toolbar.addEventListener('wheel', e => {
 		let field;
-		switch (e.target.id) {
+		switch (e.target.classList.item(0)) {
 			case 'sizeX':
-			case 'sizeXDecr':
-			case 'sizeXIncr':
-				field = document.getElementById('sizeX');
+				field = document.querySelector('.sizeX');
 				break;
 			case 'sizeY':
-			case 'sizeYDecr':
-			case 'sizeYIncr':
-				field = document.getElementById('sizeY');
+				field = document.querySelector('.sizeY');
 				break;
-			case 'decimal':
-			case 'decimalDecr':
-			case 'decimalIncr':
-				field = document.getElementById('decimal');
-				break;
+			case 'hex':
+			case 'dec':
+			case 'bin':
+				add(e.deltaY > 0 ? -1n : 1n);
+				e.preventDefault();
 			default: return;
 		}
 		if (field.disabled) return;
@@ -124,7 +135,7 @@ document.onreadystatechange = function () {
 		changeField(field);
 		e.preventDefault();
 	});
-	display.addEventListener('mousedown', (e) => {
+	display.addEventListener('mousedown', e => {
 		if (!e.target.htmlFor) return;
 		const cell = document.getElementById(e.target.htmlFor);
 		cell.checked ^= 1;
@@ -133,14 +144,14 @@ document.onreadystatechange = function () {
 		e.preventDefault();
 		genNumber();
 	});
-	display.addEventListener('mouseup', (e) => {
+	display.addEventListener('mouseup', e => {
 		if (!e.target.htmlFor) return;
 		const cell = document.getElementById(e.target.htmlFor);
 		if (cellMouseDown === cell)
 			cell.checked ^= 1;
 		cellMouseDown = null;
 	});
-	display.addEventListener('mouseover', (e) => {
+	display.addEventListener('mouseover', e => {
 		if (!cellMouseDown || !e.target.htmlFor) return;
 		document.getElementById(e.target.htmlFor).checked = isCellChecked;
 		genNumber();
@@ -149,22 +160,22 @@ document.onreadystatechange = function () {
 		cellMouseDown = null;
 	});
 
+	drawDisplay();
+
 	if (window.location.hash)
 		parseHash(window.location.hash);
 	else if (localStorage.settings)
 		parseHash(localStorage.settings);
 	if (window.location.host)
 		history.pushState(undefined, undefined, '.');
-
-	drawDisplay();
 };
 
 function drawDisplay() {
 	const display = document.getElementById('display');
 	const frag = document.createDocumentFragment();
-	size.x = parseInt(document.getElementById('sizeX').value) || 1;
+	size.x = parseInt(document.querySelector('.sizeX').value) || 1;
 	size.y = !document.getElementById('square').checked
-		? parseInt(document.getElementById('sizeY').value) || 1
+		? parseInt(document.querySelector('.sizeY').value) || 1
 		: size.x;
 	axis.x = document.getElementById('axisXL').checked ? -1 : 1;
 	axis.y = document.getElementById('axisYU').checked ? -1 : 1;
@@ -173,7 +184,7 @@ function drawDisplay() {
 	scaleDisplay();
 	while (display.childNodes.length)
 		display.removeChild(display.lastChild);
-	for (var i = 0, iLen = size.x * size.y; i < iLen; i++) {
+	for (let i = 0, iLen = size.x * size.y; i < iLen; i++) {
 		let idx = axis.y > 0 ? i : iLen - i - 1;
 		idx = axis.x + axis.y !== 0 ? idx : idx - idx % size.x * 2 + size.x - 1;
 		const cell = document.createElement('input');
@@ -199,9 +210,34 @@ function scaleDisplay() {
 		display.style.fontSize = (document.body.clientWidth - 30) / (size.x * 4 + 4) + 'px';
 }
 
+function validate(e, regex) {
+	const keyCodes = [8, 9, 13, 35, 36, 37, 38, 39, 40, 46, 116];
+	if (keyCodes.includes(e.keyCode) || e.ctrlKey || e.altKey || e.metaKey || !regex.test(e.key))
+		syncNumber(e.target);
+	else
+		e.preventDefault();
+}
+
+function add(num) {
+	if (number + num < 0n) return;
+	number += num;
+	syncNumber();
+}
+
+function syncNumber(el) {
+	const prefix = { '16': '0x', '10': '', '2': '0b' };
+	if (el)
+		number = BigInt(prefix[el.dataset.radix] + el.value);
+	document.querySelectorAll('.number').forEach(field => {
+		if (field === el) return;
+		field.value = number.toString(parseInt(field.dataset.radix));
+	});
+	genDisplay();
+}
+
 function genDisplay() {
-	let num = BigInt(document.getElementById('decimal').value);
-	for (var i = 0, iLen = size.x * size.y; i < iLen; i++) {
+	let num = number;
+	for (let i = 0, iLen = size.x * size.y; i < iLen; i++) {
 		document.getElementById(i).checked = num % 2n;
 		num >>= 1n;
 	}
@@ -209,14 +245,15 @@ function genDisplay() {
 
 function genNumber() {
 	let num = 0n;
-	document.querySelectorAll('.cell').forEach((el) => {
+	document.querySelectorAll('.cell').forEach(el => {
 		num += !el.checked ? 0n : 2n ** BigInt(el.id);
 	});
-	document.getElementById('decimal').value = num.toString();
+	number = num;
+	syncNumber();
 }
 
 function invertDisplay() {
-	document.querySelectorAll('.cell').forEach((el) => {
+	document.querySelectorAll('.cell').forEach(el => {
 		el.checked ^= 1;
 	});
 	genNumber();
@@ -232,24 +269,27 @@ function genSettings() {
 }
 
 function genHash() {
-	const numHash = encodeBase64(BigInt(document.getElementById('decimal').value));
+	const numHash = encodeBase64(number);
 	return genSettings() + (!numHash ? '' : '&' + numHash);
 }
 
 function parseHash(hash) {
+	const sizeX = document.querySelector('.sizeX');
 	const square = document.getElementById('square');
 	let res = /(\d+)(?:\.(\d+))?(L|R)(U|D)(?:&([\w-]+))?/i.exec(hash);
 	if (!res) return;
 	sizeX.value = parseInt(res[1]) || size.x;
 	if (parseInt(res[2])) {
 		square.checked = false;
-		sizeY.value = parseInt(res[2]);
+		document.querySelector('.sizeY').value = parseInt(res[2]);
 	} else
 		square.checked = true;
 	document.getElementById('axisX' + res[3].toUpperCase()).checked = true;
 	document.getElementById('axisY' + res[4].toUpperCase()).checked = true;
-	if (res[5])
-		document.getElementById('decimal').value = decodeBase64(res[5]);
+	if (res[5]) {
+		number = decodeBase64(res[5]);
+		syncNumber();
+	}
 	changeField(sizeX);
 }
 
@@ -264,30 +304,29 @@ function encodeBase64(num) {
 
 function decodeBase64(str) {
 	let num = 0n;
-	for (var i = 0; i < str.length; i++) {
+	for (let i = 0; i < str.length; i++) {
 		num <<= 6n;
 		num += BigInt(base64.indexOf(str[i]));
 	}
 	return num;
 }
 
-function copyNum() {
-	const copy = document.getElementById('copy');
-	document.getElementById('decimal').select();
+function copyNum(el) {
+	document.querySelector('.' + el.classList.item(1)).select();
 	document.execCommand('copy');
-	copy.classList.add('copied');
+	el.classList.add('copied');
 	setTimeout(() => {
-		copy.classList.remove('copied');
+		el.classList.remove('copied');
 	}, 1000);
 }
 
 function copyLink() {
-	const linkText = document.getElementById('link-text');
-	const link = document.getElementById('link');
-	linkText.value = window.location.href.split('#')[0] + '#' + genHash();
-	linkText.select();
+	const copyText = document.querySelector('.copy-text');
+	const link = document.querySelector('.link');
+	copyText.value = window.location.href.split('#')[0] + '#' + genHash();
+	copyText.select();
 	document.execCommand('copy');
-	linkText.blur();
+	copyText.blur();
 	link.classList.add('copied');
 	setTimeout(() => {
 		link.classList.remove('copied');

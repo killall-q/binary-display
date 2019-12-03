@@ -38,7 +38,7 @@ header {
 	box-shadow: 0 0 0.5rem #111;
 }
 
-#warn-ES6,
+.warn-ES6,
 noscript {
 	display: block;
 	line-height: 2rem;
@@ -49,11 +49,11 @@ noscript {
 	background-color: #F70;
 }
 
-#warn-ES6 > a {
+.warn-ES6 > a {
 	color: #07F;
 }
 
-#warn-ES6,
+.warn-ES6,
 input[type=checkbox],
 input[type=radio],
 .compact {
@@ -83,7 +83,7 @@ input[type=radio],
 
 .flex {
 	height: 0;
-	max-width: 0.6rem;
+	min-width: 1px;
 	flex-grow: 1;
 }
 
@@ -102,7 +102,8 @@ a:hover {
 	text-decoration: underline;
 }
 
-input[type=number] {
+input[type=number],
+.number {
 	height: 1.4rem;
 	width: 2rem;
 	padding: 0 0.15rem;
@@ -159,8 +160,8 @@ button,
 	box-shadow: 0 0.05rem 0.2rem #111;
 }
 
-.toolbar > button[data-field],
-.toolbar > input[type=radio] + label {
+.toolbar > input[type=radio] + label,
+.toolbar > .incr {
 	width: 1.4rem;
 }
 
@@ -169,7 +170,7 @@ button,
 	margin-left: 0.6rem;
 }
 
-.toolbar > button:not([data-field]):not(#clear) {
+.toolbar > button:not(.incr) {
 	margin-left: 0.6rem;
 }
 
@@ -242,17 +243,30 @@ button,
 	cursor: default;
 }
 
-#decimal {
+.break + span {
+	width: 2.1rem;
+}
+
+.number {
 	flex-grow: 1;
 }
 
-#copy.copied::before,
-#link.copied::before {
+.hex.number {
+	text-transform: uppercase;
+}
+
+.clear {
+	margin-left: auto !important;
+}
+
+.copy.copied::before,
+.link.copied::before {
 	position: absolute;
-	top: 2rem;
-	left: 50%;
-	transform: translate(-50%);
+	right: calc(100% + 0.6rem);
+	top: 50%;
+	transform: translateY(-50%);
 	padding: 0 0.3rem;
+	z-index: 1;
 	color: #FFF;
 	background-color: #F70;
 	border-radius: 0.2rem;
@@ -260,14 +274,14 @@ button,
 	content: 'COPIED';
 }
 
-#copy.copied::after,
-#link.copied::after {
+.copy.copied::after,
+.link.copied::after {
 	position: absolute;
-	top: 1.2rem;
-	left: 50%;
-	margin-left: -0.4rem;
+	right: calc(100% - 0.1rem);
+	top: 0.25rem;
+	z-index: 1;
 	border: 0.4rem solid transparent;
-	border-bottom-color: #F70;
+	border-left-color: #F70;
 	content: '';
 }
 
@@ -302,22 +316,22 @@ button,
 	border-color: #FFF;
 }
 
-#display > input + label:hover {
+#display > label:hover {
 	border-color: #F70 !important;
 	box-shadow: inset 0 0 0 0.2rem #F70;
 }
 
-#tips {
+.tips {
 	margin: 1rem 0;
 	font-size: 80%;
 	color: #888;
 }
 
-#tips > p {
+.tips > p {
 	margin: 0.5rem;
 }
 
-#about-bg {
+.about-bg {
 	display: none;
 	position: fixed;
 	top: 0;
@@ -327,9 +341,9 @@ button,
 	background-color: rgba(0,0,0,0.4);
 }
 
-#about-bg > div {
+.about-bg > div {
 	position: relative;
-	top: 7.4rem;
+	top: 9.2rem;
 	max-width: 20rem;
 	margin: auto;
 	padding: 1rem 2rem;
@@ -338,19 +352,20 @@ button,
 	border-radius: 0.4rem;
 }
 
-#keys > h4 {
+.keys > h4 {
 	margin-bottom: 0.8rem;
 	text-align: center;
 }
 
-#keys {
+.keys {
 	line-height: 1.5rem;
 	text-align: left;
 }
 
-#link-text {
+.copy-text {
 	position: fixed;
 	top: 100%;
+	opacity: 0;
 }
 
 @media only screen
@@ -360,24 +375,11 @@ and (max-width: 45.5rem) {
 	}
 
 	.flex {
-		max-width: initial;
 		flex: 0 0 100%;
 	}
 
-	#square + label {
-		margin-right: 0;
-	}
-
-	#decimal {
-		max-width: 16.2rem;
-	}
-
-	#clear {
-		margin-left: 0.3rem;
-	}
-
-	#about-bg > div {
-		top: 11.4rem;
+	.about-bg > div {
+		top: 11.2rem;
 	}
 }
 
@@ -390,8 +392,8 @@ and (max-width: 24rem) {
 
 @media only screen
 and (max-width: 480px) {
-	#tips,
-	#keys {
+	.tips,
+	.keys {
 		display: none;
 	}
 }

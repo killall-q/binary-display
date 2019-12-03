@@ -5,7 +5,7 @@ Can be used as a [binary](https://en.wikipedia.org/wiki/Binary_number) teaching 
 
 Link friendly. Mobile friendly.
 
-__https://killall-q.github.io/binary-display__
+__https://killall-q.github.io/binary-display/__
 
 ## Usage
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 <head>
 	<meta charset='UTF-8'>
 	<title>Binary Display</title>
@@ -8,7 +8,7 @@
 	<meta name='theme-color' content='#333'>
 	<meta property='og:title' content='Binary Display'>
 	<meta property='og:type' content='website'>
-	<meta property='og:url' content='https://killall-q.github.io/binary-display'>
+	<meta property='og:url' content='https://killall-q.github.io/binary-display/'>
 	<meta property='og:image' content='https://killall-q.github.io/binary-display/images/icon-192.png'>
 	<meta name='twitter:card' content='summary'>
 	<meta name='twitter:site' content='@joshuaptfan'>
@@ -24,17 +24,17 @@
 </head>
 <body>
 	<header>
-		<div id='warn-ES6'>Please <a href='http://outdatedbrowser.com/' target='_blank' rel='noopener'>update your browser</a> to use this site.</div>
+		<div class='warn-ES6'>Please <a href='http://outdatedbrowser.com/' target='_blank' rel='noopener'>update your browser</a> to use this site.</div>
 		<noscript>Please enable JavaScript to use this site.</noscript>
 		<div class='toolbar'>
 			<span>SIZE&ensp;X</span>
-			<input type='number' id='sizeX' min='1' max='128' value='8'>
-			<button id='sizeXDecr' value='-1' data-field='sizeX' title='[Left]'>&minus;</button>
-			<button id='sizeXIncr' value='1' data-field='sizeX' title='[Right]'>+</button>
+			<input type='number' class='sizeX' min='1' max='128' value='8'>
+			<button class='sizeX incr' value='-1' title='[Left]'>&minus;</button>
+			<button class='sizeX incr' value='1' title='[Right]'>+</button>
 			<span>Y</span>
-			<input type='number' id='sizeY' min='1' max='128' value='8' disabled>
-			<button id='sizeYDecr' value='-1' data-field='sizeY' title='[Down]'>&minus;</button>
-			<button id='sizeYIncr' value='1' data-field='sizeY' title='[Up]'>+</button>
+			<input type='number' class='sizeY' min='1' max='128' value='8' disabled>
+			<button class='sizeY incr' value='-1' title='[Down]'>&minus;</button>
+			<button class='sizeY incr' value='1' title='[Up]'>+</button>
 			<input type='checkbox' id='square' checked>
 			<label for='square'>SQUARE</label>
 			<div class='flex'></div>
@@ -48,32 +48,44 @@
 			<label for='axisYU' title='Y axis up'></label>
 			<input type='radio' id='axisYD' name='axisY' checked>
 			<label for='axisYD' title='Y axis down'></label>
-			<input type='checkbox' id='grid' autocomplete='off' checked>
+			<input type='checkbox' id='grid' class='grid' autocomplete='off' checked>
 			<label for='grid'>GRID</label>
-			<button id='about'>ABOUT</button>
+			<button class='about'>ABOUT</button>
+			<div class='break'></div>
+			<span title='Hexadecimal'>HEX</span>
+			<input class='hex number' data-radix='16' value='0' spellcheck='false'>
+			<button class='hex incr' value='-1' title='[-]'>&minus;</button>
+			<button class='hex incr' value='1' title='[=]'>+</button>
+			<button class='copy hex' title='Copy hexadecimal to clipboard'>COPY</button>
 			<div class='break'></div>
 			<span title='Decimal'>DEC</span>
-			<input type='number' id='decimal' min='0' value='0'>
-			<button id='decimalDecr' value='-1' data-field='decimal' title='[-]'>&minus;</button>
-			<button id='decimalIncr' value='1' data-field='decimal' title='[=]'>+</button>
-			<div class='flex'></div>
-			<button id='clear' title='[Backspace]'>CLEAR</button>
-			<button id='invert'>INVERT</button>
-			<button id='copy' title='Copy number to clipboard'>COPY</button>
-			<button id='link' title='Copy link to recreate currently displayed image to clipboard'>LINK</button>
+			<input type='number' class='dec number' data-radix='10' min='0' value='0'>
+			<button class='dec incr' value='-1' title='[-]'>&minus;</button>
+			<button class='dec incr' value='1' title='[=]'>+</button>
+			<button class='copy dec' title='Copy decimal to clipboard'>COPY</button>
+			<div class='break'></div>
+			<span title='Binary'>BIN</span>
+			<input type='number' class='bin number' data-radix='2' min='0' value='0'>
+			<button class='bin incr' value='-1' title='[-]'>&minus;</button>
+			<button class='bin incr' value='1' title='[=]'>+</button>
+			<button class='copy bin' title='Copy binary to clipboard'>COPY</button>
+			<div class='break'></div>
+			<button class='clear' title='[Backspace]'>CLEAR</button>
+			<button class='invert'>INVERT</button>
+			<button class='link' title='Copy link to recreate currently displayed image to clipboard'>LINK</button>
 		</div>
 	</header>
 	<div id='display'></div>
-	<div id='tips'>
+	<div class='tips'>
 		<p>Scroll over fields to add &plusmn;1</p>
 		<p>Click and drag to paint</p>
 	</div>
-	<div id='about-bg'>
+	<div class='about-bg'>
 		<div>
 			<h2>Binary Display Numeric/Visual Converter</h2>
 			<p>Lets you see what any number looks like as an image on a binary display, and vice versa.<br>
 				Can be used as a <a href='https://en.wikipedia.org/wiki/Binary_number' target='_blank' rel='noopener'>binary</a> teaching tool.</p>
-			<div id='keys'>
+			<div class='keys'>
 				<h4>Keys</h4>
 				<b>Minus</b> &mdash; decrement number<br>
 				<b>Equals</b> &mdash; increment number<br>
@@ -84,12 +96,12 @@
 			<p><a href='https://github.com/killall-q/binary-display' target='_blank' rel='noopener'>Source on GitHub</a></p>
 		</div>
 	</div>
-	<textarea id='link-text' tabindex='-1' readonly></textarea>
+	<textarea class='copy-text' tabindex='-1' readonly></textarea>
 	<script>
 		try {
 			eval('"use strict"; let test = () => 0n;');
 		} catch (e) {
-			document.getElementById('warn-ES6').style.display = 'block';
+			document.querySelector('.warn-ES6').style.display = 'block';
 		}
 	</script>
 </body>
