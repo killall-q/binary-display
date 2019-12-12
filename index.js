@@ -65,9 +65,8 @@ document.onreadystatechange = function () {
 		syncNumber();
 	});
 	document.addEventListener('click', e => {
-		if (e.target.className === 'cell') return;
-		if (e.target.classList.contains('incr')) {
-			const field = document.querySelector('.' + /^(\w+)/.exec(e.target.className)[0]);
+		if (e.target.classList.item(1) === 'incr') {
+			const field = document.querySelector('.' + e.target.classList.item(0));
 			if (/size/.test(field.className)) {
 				if (field.disabled) return;
 				field.stepUp(e.target.value);
@@ -149,7 +148,6 @@ document.onreadystatechange = function () {
 		const cell = document.getElementById(e.target.htmlFor);
 		if (cellMouseDown === cell)
 			cell.checked ^= 1;
-		cellMouseDown = null;
 	});
 	display.addEventListener('mouseover', e => {
 		if (!cellMouseDown || !e.target.htmlFor) return;
@@ -160,12 +158,13 @@ document.onreadystatechange = function () {
 		cellMouseDown = null;
 	});
 
-	drawDisplay();
-
 	if (window.location.hash)
 		parseHash(window.location.hash);
 	else if (localStorage.settings)
 		parseHash(localStorage.settings);
+	else
+		drawDisplay();
+
 	if (window.location.host)
 		history.pushState(undefined, undefined, '.');
 };
@@ -286,11 +285,11 @@ function parseHash(hash) {
 		square.checked = true;
 	document.getElementById('axisX' + res[3].toUpperCase()).checked = true;
 	document.getElementById('axisY' + res[4].toUpperCase()).checked = true;
+	changeField(sizeX);
 	if (res[5]) {
 		number = decodeBase64(res[5]);
 		syncNumber();
 	}
-	changeField(sizeX);
 }
 
 function encodeBase64(num) {
